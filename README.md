@@ -4,6 +4,8 @@
 
 Hyperion is a custom [EndeavourOS Community Edition](https://github.com/EndeavourOS-Community-Editions) built around the [Niri](https://github.com/YaLTeR/niri) scrollable-tiling Wayland compositor. It is scripted entirely in [Nushell](https://www.nushell.sh/) using a shared glue library, rather than the traditional bash approach used by other CEs.
 
+📖 **[Installation Guide](INSTALLATION.md)** - Step-by-step instructions with screenshots
+
 ![Hyperion Screenshot](assets/screenshot.jpg)
 
 ---
