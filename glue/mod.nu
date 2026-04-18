@@ -39,20 +39,20 @@ export def linux [fn: closure] {
 
 # Checks if a command can be run by checking if it exists in the system's PATH
 export def can-run [cmd: string] {
-    (which $cmd | length) > 0
+  (which $cmd | length) > 0
 }
 
 # Throws an error with a given message
 export def boom [msg: string = "An error occurred"] {
-    error make { msg: $msg }
+  error make { msg: $msg }
 }
 
 # Prompts the user to confirm an action with Y/n
 # Returns true if user confirms (Y/y or just Enter), false otherwise
 export def user-confirm [message: string]: nothing -> bool {
-    print $"($message) \(Y/n\) "
-    let response = (input)
-    return ($response in ["y", "Y", ""])
+  print $"($message) \(Y/n\) "
+  let response = (input)
+  return ($response in ["y", "Y", ""])
 }
 
 # Executes a platform-specific block of code based on the current operating system
@@ -64,15 +64,15 @@ export def user-confirm [message: string]: nothing -> bool {
 #   default: { print "Running on an unsupported platform" }
 # })
 export def platorm-do [plan: record] {
-    if (macos?) and ("macos" in $plan) {
-        do $plan.macos
-    } else if (linux?) and ("linux" in $plan) {
-        do $plan.linux
-    } else if ("default" in $plan) {
-        do $plan.default
-    } else {
-        boom $"No implementation for the current platform: ($nu.os-info.name)"
-    }
+  if (macos?) and ("macos" in $plan) {
+    do $plan.macos
+  } else if (linux?) and ("linux" in $plan) {
+    do $plan.linux
+  } else if ("default" in $plan) {
+    do $plan.default
+  } else {
+    boom $"No implementation for the current platform: ($nu.os-info.name)"
+  }
 }
 
 # Unindents a block of text by removing the minimum leading whitespace from each line.
@@ -140,11 +140,11 @@ export def unindent []: string -> string {
 # Installs a CLI tool if it is not already installed.
 # A closure should be provided to execute the installation method if the tool is not found
 export def cli-installer [cmd: string, cl: closure] {
-    if (can-run $cmd) == false {
-        do $cl
-    } else {
-        print $":: ✔️ ($cmd)"
-    }
+  if (can-run $cmd) == false {
+    do $cl
+  } else {
+    print $":: ✔️ ($cmd)"
+  }
 }
 
 # Checks if a package is installed using the system's package manager
@@ -152,21 +152,21 @@ export def cli-installer [cmd: string, cl: closure] {
 # - Linux (using `pacman` or `yay` for AUR packages)
 # - macOS (using `brew` for Homebrew packages)
 def is-installed [name: string] {
-    platorm-do ({
-        linux: {
-            let search_result_1 = run-external "pacman" "-Qi" $name | complete
-            let yay_result = if (can-run "yay") {
-                run-external "yay" "-Qi" $name | complete
-            } else {
-                {exit_code: 1}
-            }
-            return (($search_result_1.exit_code == 0) or ($yay_result.exit_code == 0))
-        },
-        macos: {
-            let search_result = run-external "brew" "list" $name | complete
-            return ($search_result.exit_code == 0)
-        }
-    })
+  platorm-do ({
+    linux: {
+      let search_result_1 = run-external "pacman" "-Qi" $name | complete
+      let yay_result = if (can-run "yay") {
+        run-external "yay" "-Qi" $name | complete
+      } else {
+        {exit_code: 1}
+      }
+      return (($search_result_1.exit_code == 0) or ($yay_result.exit_code == 0))
+    },
+    macos: {
+      let search_result = run-external "brew" "list" $name | complete
+      return ($search_result.exit_code == 0)
+    }
+  })
 }
 
 # Installs a package using the system's package manager
@@ -175,36 +175,36 @@ def is-installed [name: string] {
 # - macOS (using `brew` for Homebrew packages)
 export def install [name: string, postinstall?: closure, --aur, --sudo, --cask] {
     if (is-installed $name) {
-        print $":: ✔️ ($name)"
-        return
-    }
+    print $":: ✔️ ($name)"
+    return
+  }
 
-    linux {
-        if $aur and not (can-run "yay") {
-            print $":: ⚠️  skipping ($name) — yay not available"
-        } else {
-            let cmd = if $aur { "yay" } else { "pacman" }
-            if $sudo {
-                run-external "sudo" $cmd "-S" "--noconfirm" "--needed" $name
-            } else {
-                run-external $cmd "-S" "--noconfirm" "--needed" $name
-            }
-        }
+  linux {
+    if $aur and not (can-run "yay") {
+      print $":: ⚠️  skipping ($name) — yay not available"
+    } else {
+      let cmd = if $aur { "yay" } else { "pacman" }
+      if $sudo {
+        run-external "sudo" $cmd "-S" "--noconfirm" "--needed" $name
+      } else {
+        run-external $cmd "-S" "--noconfirm" "--needed" $name
+      }
     }
+  }
 
-    macos {
-        if $cask {
-            run-external "brew" "install" "--cask" $name
-        } else {
-            run-external "brew" "install" $name
-        }
+  macos {
+    if $cask {
+      run-external "brew" "install" "--cask" $name
+    } else {
+      run-external "brew" "install" $name
     }
+  }
 
-    if $postinstall != null {
-      do $postinstall
-    }
+  if $postinstall != null {
+    do $postinstall
+  }
 
-    print $"🆕 ($name)"
+  print $"🆕 ($name)"
 }
 
 # Uninstalls a package using the system's package manager
@@ -212,25 +212,25 @@ export def install [name: string, postinstall?: closure, --aur, --sudo, --cask] 
 # - Linux (using `pacman` or `yay` for AUR packages)
 # - macOS (using `brew` for Homebrew packages)
 export def uninstall [name: string, --aur, --sudo] {
-    if not (is-installed $name) {
-        print $":: ($name) is not installed"
-        return
-    }
+  if not (is-installed $name) {
+    print $":: ($name) is not installed"
+    return
+  }
 
-    linux {
-        let cmd = if $aur { "yay" } else { "pacman" }
-        if $sudo {
-            run-external "sudo" $cmd "-R" $name
-        } else {
-            run-external $cmd "-R" $name
-        }
+  linux {
+    let cmd = if $aur { "yay" } else { "pacman" }
+    if $sudo {
+      run-external "sudo" $cmd "-R" $name
+    } else {
+      run-external $cmd "-R" $name
     }
+  }
 
-    macos {
-        run-external "brew" "uninstall" $name
-    }
+  macos {
+    run-external "brew" "uninstall" $name
+  }
 
-    print $"🗑️  ($name)"
+  print $"🗑️  ($name)"
 }
 
 
@@ -251,15 +251,15 @@ export def "inject into" [file_path] {
     let end_marker_search = ($existing_content | lines | enumerate | where $it.item == $end_marker_text)
 
     if ($start_marker_search | length) > 0 and ($end_marker_search | length) > 0 {
-        let start_marker_idx = $start_marker_search | first | get index
-        let end_marker_idx = $end_marker_search | last | get index
+      let start_marker_idx = $start_marker_search | first | get index
+      let end_marker_idx = $end_marker_search | last | get index
 
-        let content = $existing_content | lines | enumerate | where ($it.index < $start_marker_idx or $it.index > $end_marker_idx) | get item | str join "\n"
-        $content | save -f $file_path
+      let content = $existing_content | lines | enumerate | where ($it.index < $start_marker_idx or $it.index > $end_marker_idx) | get item | str join "\n"
+      $content | save -f $file_path
     }
 
     let managed_block = (
-        "\n" + $start_marker_text + "\n" + $block_content + "\n" + $end_marker_text
+      "\n" + $start_marker_text + "\n" + $block_content + "\n" + $end_marker_text
     )
     $managed_block | save --append $file_path
 }
@@ -274,31 +274,31 @@ export def with-chaotic-aur [block: closure] {
     let already_present = ($backup | str contains "[chaotic-aur]")
 
     if not $already_present {
-        print ":: Adding Chaotic-AUR keyring..."
-        run-external "pacman-key" "--recv-key" "3056513887B78AEB" "--keyserver" "keyserver.ubuntu.com"
-        run-external "pacman-key" "--lsign-key" "3056513887B78AEB"
-        run-external "pacman" "-U" "--noconfirm" "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst"
-        run-external "pacman" "-U" "--noconfirm" "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst"
-        $chaotic_block | inject into $pacman_conf_path
-        run-external "pacman" "-Sy" "--noconfirm"
-        print ":: ✔️ Chaotic-AUR temporarily enabled"
+      print ":: Adding Chaotic-AUR keyring..."
+      run-external "pacman-key" "--recv-key" "3056513887B78AEB" "--keyserver" "keyserver.ubuntu.com"
+      run-external "pacman-key" "--lsign-key" "3056513887B78AEB"
+      run-external "pacman" "-U" "--noconfirm" "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst"
+      run-external "pacman" "-U" "--noconfirm" "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst"
+      $chaotic_block | inject into $pacman_conf_path
+      run-external "pacman" "-Sy" "--noconfirm"
+      print ":: ✔️ Chaotic-AUR temporarily enabled"
     }
 
     let result = try {
-        do $block
-        {ok: true}
+      do $block
+      {ok: true}
     } catch {|e|
-        {ok: false, error: $e}
+      {ok: false, error: $e}
     }
 
     if not $already_present {
-        $backup | save -f $pacman_conf_path
-        run-external "pacman" "-Sy" "--noconfirm"
-        print ":: ✔️ Chaotic-AUR removed, pacman.conf restored"
+      $backup | save -f $pacman_conf_path
+      run-external "pacman" "-Sy" "--noconfirm"
+      print ":: ✔️ Chaotic-AUR removed, pacman.conf restored"
     }
 
     if not $result.ok {
-        error make { msg: $result.error.msg }
+      error make { msg: $result.error.msg }
     }
 }
 
@@ -312,28 +312,28 @@ const autoload_dir = $vendor_path | path join "autoload"
 # Installs a vendor package from a Git repository if it is not already installed
 # An optional closure can be provided to execute additional actions after the package is cloned
 export def nu-vendor-install [repo: string, postinstall?: closure] {
-    let name = $repo | path basename
-    let location = ($vendor_path | path join $name)
+  let name = $repo | path basename
+  let location = ($vendor_path | path join $name)
 
-    if ($location | path exists) == false {
-        mkdir $vendor_path
-        print $"::vendor-install ($name)"
-        git clone --depth=1 $"https://($repo)" $location
-        if $postinstall != null {
-            do $postinstall $location
-        }
+  if ($location | path exists) == false {
+    mkdir $vendor_path
+    print $"::vendor-install ($name)"
+    git clone --depth=1 $"https://($repo)" $location
+    if $postinstall != null {
+      do $postinstall $location
     }
+  }
 }
 
 # Autoloads a script by saving it to the Nushell's autoload directory if it does not already exist
 # The script is generated by executing the provided closure which should return the script content.
 export def nu-autoload-script [name: string, fn: closure] {
-    let location = ($autoload_dir | path join $name)
-    if ($location | path exists) == false {
-        print $":: autoload-script ($name)"
-        mkdir $autoload_dir
-        do $fn | save -f $location
-    }
+  let location = ($autoload_dir | path join $name)
+  if ($location | path exists) == false {
+    print $":: autoload-script ($name)"
+    mkdir $autoload_dir
+    do $fn | save -f $location
+  }
 }
 
 # --------------------------------------------------
