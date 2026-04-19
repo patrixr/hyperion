@@ -9,11 +9,20 @@ def "main boot-routine" [] {
   # Ensure config directory exists
   mkdir $config_dir
   
-  # Load or create store
+  # Load or create store - ensure we always have a valid record
   mut store = if ($store_file | path exists) {
-    open $store_file
+    try {
+      open $store_file
+    } catch {
+      {}
+    }
   } else {
     {}
+  }
+  
+  # Ensure store is a record (in case file was corrupted)
+  if ($store | describe) != "record" {
+    $store = {}
   }
   
   # Show welcome on first boot
