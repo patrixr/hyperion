@@ -1,121 +1,44 @@
-use glue *
+#!/usr/bin/env nu
+# hyperion.nu
+# EndeavourOS Community Edition — Hyperion
+# Main entry point for Hyperion installation
+#
+# Usage:
+#   nu hyperion.nu                    # Run as regular user, will request sudo
+#   sudo nu hyperion.nu               # Run as root (auto-detects user)
+#   nu hyperion.nu username           # Specify target user explicitly (ISO mode)
 
-def conf-src [name: string] {
-  $env.FILE_PWD | path join ("configs/" + $name)
-}
-
-def home-dir [] {
-  let target_user = ($env | get --optional HYPERION_USER | default $env.USER)
-  $"/home/($target_user)"
-}
-
-# Deploys a config folder to both the target user's ~/.config and /etc/skel/.config
-def dotconf [name: string] {
-  let folder = conf-src $name
-  let destinations = [
-    (home-dir | path join ".config")
-    "/etc/skel/.config"
-  ]
-  for dest in $destinations {
-    mkdir $dest
-    cp -r $folder $dest
+def main [username?: string] {
+  # Determine the target username
+  let target_user = if ($username != null) {
+    $username
+  } else if ($env | get --optional HYPERION_USER) != null {
+    $env.HYPERION_USER
+  } else if ($env | get --optional SUDO_USER) != null {
+    $env.SUDO_USER
+  } else {
+    $env.USER
   }
-  print $":: ✔️ .config/($name)"
-}
 
-group "📦 System Packages" {
+  print $":: Hyperion CE — install/update for user: ($target_user)"
 
-  install nushell {
-    let nu_path = (which nu | first | get path)
-    let shells = (open /etc/shells)
-    if not ($shells | str contains $nu_path) {
-      run-external "tee" "-a" "/etc/shells" | $nu_path
+  # Check if we're running as root
+  let is_root = (id -u | into int) == 0
+
+  # Determine script directory
+  let script_dir = $env.FILE_PWD
+
+  if $is_root {
+    # Already root, run install directly
+    print ":: Running as root"
+    with-env { HYPERION_USER: $target_user } {
+      nu ($script_dir | path join "install.nu")
     }
-    let target_user = ($env | get --optional HYPERION_USER | default $env.USER)
-    run-external "chsh" "-s" $nu_path $target_user
-    print $":: ✔️ Default shell set to ($nu_path)"
+  } else {
+    # Not root, need to elevate
+    print ":: Requesting sudo access..."
+    sudo nu -c $"cd ($script_dir); HYPERION_USER=($target_user) nu install.nu"
   }
 
-  install sddm {
-    run-external "systemctl" "enable" "sddm"
-    print ":: ✔️ SDDM enabled"
-  }
-
-  install qt6-svg
-  install qt6-virtualkeyboard
-  install qt6-multimedia-ffmpeg
-
-  install niri
-  install ghostty
-
-  with-chaotic-aur {
-    install noctalia-shell
-  }
-}
-
-group "📁 Configs" {
-  dotconf niri
-  dotconf noctalia
-  dotconf ghostty
-}
-
-group "🎨 SDDM Theme" {
-  # Deploy SDDM theme
-  let theme_src = $env.FILE_PWD | path join "configs/sddm"
-  let theme_dest = "/usr/share/sddm/themes/hyperion"
-
-  mkdir $theme_dest
-
-  for item in (ls $theme_src) {
-      cp -r $item.name $theme_dest
-  }
-  print ":: ✔️ SDDM theme deployed to /usr/share/sddm/themes/hyperion"
-
-  # Install fonts
-  let fonts_src = $theme_dest | path join "fonts"
-  for item in (ls $fonts_src) {
-      cp -r $item.name "/usr/share/fonts/"
-  }
-  print ":: ✔️ SDDM theme fonts installed"
-
-  # Configure SDDM to use the theme with environment variables
-  let sddm_conf_dir = "/etc/sddm.conf.d"
-  mkdir $sddm_conf_dir
-  let sddm_config = "[General]\nInputMethod=qtvirtualkeyboard\nGreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/hyperion/components/,QT_IM_MODULE=qtvirtualkeyboard\n\n[Theme]\nCurrent=hyperion\n"
-  $sddm_config | save -f ($sddm_conf_dir | path join "hyperion.conf")
-  print ":: ✔️ SDDM configured to use hyperion theme"
-}
-
-group "🖼️ Wallpapers" {
-  let images_folder = $env.FILE_PWD | path join "images"
-  let destinations = [
-    (home-dir | path join "Pictures/Wallpapers")
-    "/etc/skel/Pictures/Wallpapers"
-  ]
-  for dest in $destinations {
-    mkdir $dest
-    for file in (ls $images_folder | where type == file) {
-      cp $file.name $dest
-    }
-  }
-  print ":: ✔️ Wallpapers copied to user home and /etc/skel"
-
-  # Create Noctalia wallpaper configuration for current user
-  let cache_dir = (home-dir | path join ".cache/noctalia")
-  mkdir $cache_dir
-
-  let wallpaper_config = {
-    defaultWallpaper: (home-dir | path join "Pictures/Wallpapers/bg-1.png"),
-    usedRandomWallpapers: {},
-    wallpapers: {}
-  }
-
-  $wallpaper_config | to json | save -f ($cache_dir | path join "wallpapers.json")
-  print ":: ✔️ Noctalia wallpaper configuration created"
-}
-
-group "🔑 Permissions" {
-  let target_user = ($env | get --optional HYPERION_USER | default $env.USER)
-  run-external "chown" "-R" $"($target_user):($target_user)" (home-dir)
-  print $":: ✔️ Ownership of (home-dir) restored to ($target_user)"
+  print ":: Hyperion CE complete. Log out and back in for all changes to take effect."
 }

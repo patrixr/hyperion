@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Hyperion Welcome
+Exec=quickshell -p /opt/hyperion/bin/hyperion-welcome/shell.qml
+Icon=distributor-logo
+Categories=System;
+NoDisplay=true

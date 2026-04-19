@@ -18,6 +18,7 @@ Hyperion is a custom [EndeavourOS Community Edition](https://github.com/Endeavou
 | Display Manager | SDDM                                                               |
 | Shell           | [Noctalia](https://github.com/noctalia-dev/noctalia-shell)         |
 | Terminal        | [Ghostty](https://ghostty.org/)                                    |
+| File Manager    | Nautilus (GNOME Files)                                             |
 | Default Shell   | Nushell                                                            |
 
 ---

@@ -4,22 +4,13 @@
 # Manual install/update script for post-installation use
 #
 # Usage:
-#   curl -sL https://raw.githubusercontent.com/patrixr/hyperion/main/hyperion.sh | sudo bash
+#   curl -sL https://raw.githubusercontent.com/patrixr/hyperion/main/hyperion.sh | bash
 #   OR
-#   git clone https://github.com/patrixr/hyperion.git && cd hyperion && sudo ./hyperion.sh
+#   git clone https://github.com/patrixr/hyperion.git && cd hyperion && ./hyperion.sh
 #
-# Must be run with sudo.
+# Can be run as regular user or with sudo.
 
 set -euo pipefail
-
-if [ "$EUID" -ne 0 ]; then
-    echo "This script must be run with sudo."
-    exit 1
-fi
-
-username="${SUDO_USER:-$(logname)}"
-
-echo ":: Hyperion CE — install/update for user: $username"
 
 # Always clone from GitHub when piped, or check local when run from file
 if [ -f "hyperion.nu" ]; then
@@ -37,10 +28,12 @@ fi
 
 # Install nushell if needed
 echo ":: Bootstrapping nushell..."
-pacman -S --needed --noconfirm nushell
+if [ "$EUID" -eq 0 ]; then
+    pacman -S --needed --noconfirm nushell
+else
+    sudo pacman -S --needed --noconfirm nushell
+fi
 
-# Run the main nushell install script
+# Run the main nushell entry point
 echo ":: Running Hyperion installer..."
-HYPERION_USER="$username" nu "$HYPERION_DIR/hyperion.nu"
-
-echo ":: Hyperion CE complete. Log out and back in for all changes to take effect."
+nu "$HYPERION_DIR/hyperion.nu"
