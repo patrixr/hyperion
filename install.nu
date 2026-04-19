@@ -74,6 +74,14 @@ group "🎨 SDDM Theme" {
       cp -r $item.name $theme_dest
   }
   print ":: ✔️ SDDM theme deployed to /usr/share/sddm/themes/hyperion"
+  
+  # Copy background images from images/ to theme backgrounds/
+  let images_src = $env.FILE_PWD | path join "images"
+  let backgrounds_dest = $theme_dest | path join "backgrounds"
+  for file in (ls $images_src | where type == file and name =~ 'bg-.*\.(jpg|png)') {
+    cp $file.name $backgrounds_dest
+  }
+  print ":: ✔️ Background images copied to SDDM theme"
 
   # Install fonts
   let fonts_src = $theme_dest | path join "fonts"
