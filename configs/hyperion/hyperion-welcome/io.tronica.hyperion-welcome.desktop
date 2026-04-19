@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Hyperion Welcome
+Exec=bash -c "quickshell -p $HOME/.config/hyperion/hyperion-welcome/shell.qml"
+Icon=endeavouros-icon
+Categories=System;
+Terminal=false
+NoDisplay=false

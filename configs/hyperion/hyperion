@@ -1,0 +1,38 @@
+#!/usr/bin/env nu
+# Hyperion system utilities
+
+# Boot routine - runs on system startup
+def "main boot-routine" [] {
+  let config_dir = ($env.HOME | path join ".config/hyperion")
+  let store_file = ($config_dir | path join "store.json")
+  
+  # Ensure config directory exists
+  mkdir $config_dir
+  
+  # Load or create store
+  mut store = if ($store_file | path exists) {
+    open $store_file
+  } else {
+    {}
+  }
+  
+  # Show welcome on first boot
+  if not ($store | get -i welcome_shown | default false) {
+    print "First boot detected - launching Hyperion Welcome"
+    
+    # Launch quickshell in background
+    let welcome_path = ($env.HOME | path join ".config/hyperion/hyperion-welcome/shell.qml")
+    run-external "sh" "-c" $"setsid quickshell -p '($welcome_path)' >/dev/null 2>&1 &"
+    
+    # Update store to mark welcome as shown (merge, don't override)
+    $store = ($store | merge { welcome_shown: true })
+    $store | save -f $store_file
+  }
+}
+
+# Main entry point
+def main [] {
+  print "Hyperion system utilities"
+  print "Available commands:"
+  print "  boot-routine - Run boot initialization"
+}
