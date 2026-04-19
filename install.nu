@@ -49,6 +49,7 @@ group "📦 System Packages" {
   install niri
   install ghostty
   install nautilus
+  install zsh
 
   add-chaotic-aur
   install noctalia-shell
@@ -58,6 +59,7 @@ group "📁 Configs" {
   dotconf niri
   dotconf noctalia
   dotconf ghostty
+  dotconf hyperion
 }
 
 group "🎨 SDDM Theme" {
@@ -113,6 +115,20 @@ group "🖼️ Wallpapers" {
 
   $wallpaper_config | to json | save -f ($cache_dir | path join "wallpapers.json")
   print ":: ✔️ Noctalia wallpaper configuration created"
+}
+
+group "🚀 Hyperion Welcome" {
+  # Deploy desktop file
+  let desktop_src = $env.FILE_PWD | path join "configs/hyperion/hyperion-welcome/io.tronica.hyperion-welcome.desktop"
+  let destinations = [
+    (home-dir | path join ".local/share/applications")
+    "/etc/skel/.local/share/applications"
+  ]
+  for dest in $destinations {
+    mkdir $dest
+    cp $desktop_src $dest
+  }
+  print ":: ✔️ Hyperion Welcome desktop file installed"
 }
 
 group "🔑 Permissions" {
