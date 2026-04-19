@@ -17,7 +17,7 @@ def "main boot-routine" [] {
   }
   
   # Show welcome on first boot
-  if not ($store | get -i welcome_shown | default false) {
+  if not ($store | get -o welcome_shown | default false) {
     print "First boot detected - launching Hyperion Welcome"
     
     # Launch quickshell in background
