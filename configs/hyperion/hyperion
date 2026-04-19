@@ -21,7 +21,7 @@ def "main boot-routine" [] {
   }
   
   # Ensure store is a record (in case file was corrupted)
-  if ($store | describe) != "record" {
+  if ($store | describe | str starts-with "record") == false {
     $store = {}
   }
   
