@@ -30,9 +30,17 @@ def "main boot-routine" [] {
   }
 }
 
+# Launch the welcome screen
+def "main welcome-screen" [] {
+  print "Launching Hyperion Welcome"
+  let welcome_path = ($env.HOME | path join ".config/hyperion/hyperion-welcome/shell.qml")
+  run-external "quickshell" "-p" $welcome_path
+}
+
 # Main entry point
 def main [] {
   print "Hyperion system utilities"
   print "Available commands:"
-  print "  boot-routine - Run boot initialization"
+  print "  boot-routine    - Run boot initialization"
+  print "  welcome-screen  - Launch the welcome screen"
 }
