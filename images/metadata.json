@@ -1,0 +1,36 @@
+{
+  "images": [
+    {
+      "filename": "bg-1.png",
+      "source": "DeviantArt",
+      "author": "prisonercoin",
+      "link": "https://www.deviantart.com/prisonercoin/art/Final-Frontier-918347015",
+      "license": "Exclusive Adoptable - Commercial Use (owned)",
+      "notes": "Final Frontier - Exclusive adoptable purchased with full commercial rights"
+    },
+    {
+      "filename": "bg-2.jpg",
+      "source": "Unsplash",
+      "author": "Jacob Granneman",
+      "link": "https://unsplash.com/photos/person-sitting-on-brown-sand-under-starry-night-lakRKK8DDiw",
+      "license": "Unsplash License",
+      "notes": "Parallels - Person sitting on brown sand under starry night"
+    },
+    {
+      "filename": "bg-3.jpg",
+      "source": "Unsplash",
+      "author": "Thomas Chizzali",
+      "link": "https://unsplash.com/photos/the-night-sky-is-filled-with-stars-and-a-lone-tree-K-ENC7LNABA",
+      "license": "Unsplash License",
+      "notes": "The night sky is filled with stars and a lone tree"
+    },
+    {
+      "filename": "bg-4.png",
+      "source": "DeviantArt",
+      "author": "prisonercoin",
+      "link": "https://www.deviantart.com/prisonercoin/art/Pridwen-920040742",
+      "license": "Exclusive Adoptable - Commercial Use (owned)",
+      "notes": "Pridwen - Exclusive adoptable purchased with full commercial rights"
+    }
+  ]
+}
