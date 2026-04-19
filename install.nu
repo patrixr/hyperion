@@ -50,6 +50,7 @@ group "📦 System Packages" {
   install ghostty
   install nautilus
   install zsh
+  install zenity
 
   add-chaotic-aur
   install noctalia-shell
