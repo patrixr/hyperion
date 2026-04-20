@@ -90,10 +90,10 @@ group "🎨 SDDM Theme" {
   }
   print ":: ✔️ SDDM theme fonts installed"
 
-  # Configure SDDM to use the theme with environment variables and setup script
+  # Configure SDDM to use the theme with environment variables
   let sddm_conf_dir = "/etc/sddm.conf.d"
   mkdir $sddm_conf_dir
-  let sddm_config = "[General]\nInputMethod=qtvirtualkeyboard\nGreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/hyperion/components/,QT_IM_MODULE=qtvirtualkeyboard\n\n[Theme]\nCurrent=hyperion\n\n[X11]\nDisplayCommand=/usr/share/sddm/themes/hyperion/scripts/sync-avatars.sh\n\n[Wayland]\nDisplayCommand=/usr/share/sddm/themes/hyperion/scripts/sync-avatars.sh\n"
+  let sddm_config = "[General]\nInputMethod=qtvirtualkeyboard\nGreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/hyperion/components/,QT_IM_MODULE=qtvirtualkeyboard\n\n[Theme]\nCurrent=hyperion\n"
   $sddm_config | save -f ($sddm_conf_dir | path join "hyperion.conf")
   print ":: ✔️ SDDM configured to use hyperion theme"
 }

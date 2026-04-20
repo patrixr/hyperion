@@ -1,12 +1,44 @@
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Controls
+import Qt.labs.platform
 
 Rectangle {
     id: avatar
     property string shape: Config.avatarShape
     property string source: ""
+    property string actualSource: getNoctaliaAvatar()
     property bool active: false
+    
+    // Try to get avatar from noctalia settings if SDDM doesn't have one
+    function getNoctaliaAvatar() {
+        // If SDDM already has an avatar that exists, use it
+        if (source && source !== "" && source.indexOf("user-default") === -1) {
+            return source;
+        }
+        
+        // Try to read noctalia settings
+        var username = sddm.currentUser || "";
+        if (username === "") return source;
+        
+        var settingsPath = "/home/" + username + "/.config/noctalia/settings.json";
+        var request = new XMLHttpRequest();
+        request.open("GET", "file://" + settingsPath, false);
+        
+        try {
+            request.send(null);
+            if (request.status === 200 || request.status === 0) {
+                var settings = JSON.parse(request.responseText);
+                if (settings.avatarImage) {
+                    return "file://" + settings.avatarImage;
+                }
+            }
+        } catch (e) {
+            // Noctalia settings not found or invalid, fall back to SDDM source
+        }
+        
+        return source;
+    }
     property int squareRadius: (shape == "circle") ? this.width : (Config.avatarBorderRadius === 0 ? 1 : Config.avatarBorderRadius * Config.generalScale) // min: 1
     property bool drawStroke: (active && Config.avatarActiveBorderSize > 0) || (!active && Config.avatarInactiveBorderSize > 0)
     property color strokeColor: active ? Config.avatarActiveBorderColor : Config.avatarInactiveBorderColor
@@ -32,7 +64,7 @@ Rectangle {
 
     Image {
         id: faceImage
-        source: parent.source
+        source: parent.actualSource
         anchors.fill: parent
         mipmap: true
         antialiasing: true
