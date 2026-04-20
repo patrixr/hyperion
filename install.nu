@@ -124,6 +124,17 @@ group "🖼️ Wallpapers" {
 
   $wallpaper_config | to json | save -f ($cache_dir | path join "wallpapers.json")
   print ":: ✔️ Noctalia wallpaper configuration created"
+
+  # Create default user avatar
+  let default_avatar = $images_folder | path join "default-avatar.png"
+  let avatar_destinations = [
+    (home-dir | path join ".face")
+    "/etc/skel/.face"
+  ]
+  for dest in $avatar_destinations {
+    cp $default_avatar $dest
+  }
+  print ":: ✔️ Default user avatar created"
 }
 
 group "🚀 Hyperion Welcome" {

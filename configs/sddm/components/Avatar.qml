@@ -7,6 +7,7 @@ Rectangle {
     id: avatar
     property string shape: Config.avatarShape
     property string source: ""
+    property string username: ""
     property bool active: false
     
     // JavaScript function to read file synchronously
@@ -26,25 +27,30 @@ Rectangle {
         }
         
         // Try to load from noctalia settings
-        var username = sddm.currentUser || "";
-        if (username === "") {
+        var user = username !== "" ? username : (sddm.currentUser || "");
+        if (user === "") {
+            console.log("Avatar: No username available, using default");
             return source;
         }
         
-        var settingsPath = "file:///home/" + username + "/.config/noctalia/settings.json";
+        var settingsPath = "file:///home/" + user + "/.config/noctalia/settings.json";
         
         try {
             var jsonText = readTextFile(settingsPath);
             var settings = JSON.parse(jsonText);
             if (settings && settings.avatarImage) {
+                console.log("Avatar: Loading from noctalia for user " + user + ": " + settings.avatarImage);
                 return "file://" + settings.avatarImage;
             }
         } catch (e) {
             // Settings file not found or invalid JSON
-            console.warn("Could not load noctalia avatar:", e);
+            console.log("Avatar: Could not load noctalia settings for user " + user + ": " + e);
         }
         
-        return source;
+        // Fallback to checking if ~/.face exists
+        var facePath = "file:///home/" + user + "/.face";
+        console.log("Avatar: Falling back to ~/.face for user " + user);
+        return facePath;
     }
     property int squareRadius: (shape == "circle") ? this.width : (Config.avatarBorderRadius === 0 ? 1 : Config.avatarBorderRadius * Config.generalScale) // min: 1
     property bool drawStroke: (active && Config.avatarActiveBorderSize > 0) || (!active && Config.avatarInactiveBorderSize > 0)
