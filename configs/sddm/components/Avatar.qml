@@ -1,40 +1,47 @@
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Controls
-import Qt.labs.platform
+import Qt.labs.folderlistmodel
 
 Rectangle {
     id: avatar
     property string shape: Config.avatarShape
     property string source: ""
-    property string actualSource: getNoctaliaAvatar()
     property bool active: false
     
-    // Try to get avatar from noctalia settings if SDDM doesn't have one
-    function getNoctaliaAvatar() {
-        // If SDDM already has an avatar that exists, use it
+    // JavaScript function to read file synchronously
+    // Using Qt.include to load and execute JavaScript that reads the file
+    function readTextFile(filePath) {
+        var request = new XMLHttpRequest();
+        request.open("GET", filePath, false); // Synchronous
+        request.send(null);
+        return request.responseText;
+    }
+    
+    // Compute the actual avatar source
+    property string actualSource: {
+        // First try SDDM's provided source
         if (source && source !== "" && source.indexOf("user-default") === -1) {
             return source;
         }
         
-        // Try to read noctalia settings
+        // Try to load from noctalia settings
         var username = sddm.currentUser || "";
-        if (username === "") return source;
+        if (username === "") {
+            return source;
+        }
         
-        var settingsPath = "/home/" + username + "/.config/noctalia/settings.json";
-        var request = new XMLHttpRequest();
-        request.open("GET", "file://" + settingsPath, false);
+        var settingsPath = "file:///home/" + username + "/.config/noctalia/settings.json";
         
         try {
-            request.send(null);
-            if (request.status === 200 || request.status === 0) {
-                var settings = JSON.parse(request.responseText);
-                if (settings.avatarImage) {
-                    return "file://" + settings.avatarImage;
-                }
+            var jsonText = readTextFile(settingsPath);
+            var settings = JSON.parse(jsonText);
+            if (settings && settings.avatarImage) {
+                return "file://" + settings.avatarImage;
             }
         } catch (e) {
-            // Noctalia settings not found or invalid, fall back to SDDM source
+            // Settings file not found or invalid JSON
+            console.warn("Could not load noctalia avatar:", e);
         }
         
         return source;
