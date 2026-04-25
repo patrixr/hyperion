@@ -57,11 +57,18 @@ group "📦 System Packages" {
   install qt6-virtualkeyboard
   install qt6-multimedia-ffmpeg
 
+  # System basics
   install niri
   install ghostty
   install nautilus
   install zsh
   install zenity
+
+  # Supported mtp connections for devices like cameras/etc
+  install gvfs-mtp
+
+  # Webcam support in calls
+  install xdg-desktop-portal-wlr
 
   add-chaotic-aur
   install noctalia-shell
@@ -69,7 +76,16 @@ group "📦 System Packages" {
 
 group "📁 Configs" {
   dotconf niri
-  dotconf noctalia
+  # Deploy noctalia config — intentionally skip settings.json so noctalia
+  # opens its setup wizard on first launch and creates its own settings.
+  let noctalia_src = conf-src "noctalia"
+  for dest in [(home-dir | path join ".config"), "/etc/skel/.config"] {
+    mkdir ($dest | path join "noctalia")
+    for item in (ls $noctalia_src | where name !~ 'settings\.json') {
+      cp -r $item.name ($dest | path join "noctalia")
+    }
+  }
+  print ":: ✔️ .config/noctalia (settings.json excluded — wizard will run on first boot)"
   dotconf ghostty
   dotconf hyperion --always-update
 }
@@ -85,7 +101,7 @@ group "🎨 SDDM Theme" {
       cp -r $item.name $theme_dest
   }
   print ":: ✔️ SDDM theme deployed to /usr/share/sddm/themes/hyperion"
-  
+
   # Copy background images from images/ to theme backgrounds/
   let images_src = $env.FILE_PWD | path join "images"
   let backgrounds_dest = $theme_dest | path join "backgrounds"
