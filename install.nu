@@ -76,16 +76,13 @@ group "📦 System Packages" {
 
 group "📁 Configs" {
   dotconf niri
-  # Deploy noctalia config — intentionally skip settings.json so noctalia
-  # opens its setup wizard on first launch and creates its own settings.
-  let noctalia_src = conf-src "noctalia"
-  for dest in [(home-dir | path join ".config"), "/etc/skel/.config"] {
-    mkdir ($dest | path join "noctalia")
-    for item in (ls $noctalia_src | where name !~ 'settings\.json') {
-      cp -r $item.name ($dest | path join "noctalia")
-    }
+  # Deploy custom noctalia colorschemes — everything else noctalia generates itself
+  let colorschemes_src = conf-src "noctalia" | path join "colorschemes"
+  for dest in [(home-dir | path join ".config/noctalia/colorschemes"), "/etc/skel/.config/noctalia/colorschemes"] {
+    mkdir $dest
+    cp -r $colorschemes_src $dest
   }
-  print ":: ✔️ .config/noctalia (settings.json excluded — wizard will run on first boot)"
+  print ":: ✔️ .config/noctalia/colorschemes"
   dotconf ghostty
   dotconf hyperion --always-update
 }
