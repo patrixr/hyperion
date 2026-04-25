@@ -65,7 +65,11 @@ After installation completes and you reboot:
 If you already have EndeavourOS installed, you can install Hyperion manually:
 
 ```bash
+# Install latest stable release
 curl -sL https://github.com/patrixr/hyperion/releases/latest/download/hyperion.sh | sudo bash
+
+# Install a specific version
+curl -sL https://github.com/patrixr/hyperion/releases/download/v0.1.1/hyperion.sh | sudo bash
 ```
 
 Or clone and run locally:
