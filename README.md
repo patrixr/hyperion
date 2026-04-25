@@ -97,9 +97,9 @@ The real work happens in `hyperion.nu`, which:
 
 ## Tested Devices
 
-| CPU | GPU | RAM | Status |
-|-----|-----|-----|--------|
-| AMD Ryzen AI 5 PRO 340 w/ Radeon 840M | AMD Radeon 840M | 54GB | ✅ Working |
+| CPU | GPU | RAM | EndeavourOS | Status |
+|-----|-----|-----|-------------|--------|
+| AMD Ryzen AI 5 PRO 340 w/ Radeon 840M | AMD Radeon 840M | 54GB | Titan (2026.03.06) | ✅ Working |
 
 ---
 
