@@ -62,10 +62,10 @@ https://github.com/patrixr/hyperion/releases/latest/download/setup_hyperion_isom
 
 ```bash
 # Install latest stable release
-curl -sL https://raw.githubusercontent.com/patrixr/hyperion/main/install.sh | sudo bash
+curl -sL https://github.com/patrixr/hyperion/releases/latest/download/hyperion.sh | sudo bash
 
 # Install a specific version
-curl -sL https://raw.githubusercontent.com/patrixr/hyperion/main/install.sh | sudo bash -s -- --version v0.1.1
+curl -sL https://github.com/patrixr/hyperion/releases/download/v0.1.1/hyperion.sh | sudo bash
 ```
 
 Both scripts:
