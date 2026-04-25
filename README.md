@@ -61,13 +61,11 @@ https://github.com/patrixr/hyperion/releases/latest/download/setup_hyperion_isom
 **Manual install** (after installation):
 
 ```bash
-# One-line install
-curl -sL https://github.com/patrixr/hyperion/releases/latest/download/hyperion.sh | sudo bash
+# Install latest stable release
+curl -sL https://raw.githubusercontent.com/patrixr/hyperion/main/install.sh | sudo bash
 
-# Or clone first
-git clone --depth=1 https://github.com/patrixr/hyperion.git
-cd hyperion
-sudo ./hyperion.sh
+# Install a specific version
+curl -sL https://raw.githubusercontent.com/patrixr/hyperion/main/install.sh | sudo bash -s -- --version v0.1.1
 ```
 
 Both scripts:
