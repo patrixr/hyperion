@@ -41,3 +41,4 @@ jobs:
             hyperion.sh \
             --title "${{ steps.tag.outputs.new_tag }}" \
             --notes "${{ steps.tag.outputs.changelog }}"
+# Testing release workflow
