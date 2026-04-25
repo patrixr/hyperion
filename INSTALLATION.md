@@ -24,7 +24,7 @@ In the live environment, open the **EndeavourOS Installer** and choose **"Fetch 
 Type or paste the URL for the Hyperion setup script:
 
 ```
-https://raw.githubusercontent.com/patrixr/hyperion/main/setup_hyperion_isomode.bash
+https://github.com/patrixr/hyperion/releases/latest/download/setup_hyperion_isomode.bash
 ```
 
 ![Paste Installation URL](assets/2-paste-script-eos.png)
@@ -65,7 +65,7 @@ After installation completes and you reboot:
 If you already have EndeavourOS installed, you can install Hyperion manually:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/patrixr/hyperion/main/hyperion.sh | sudo bash
+curl -sL https://github.com/patrixr/hyperion/releases/latest/download/hyperion.sh | sudo bash
 ```
 
 Or clone and run locally:

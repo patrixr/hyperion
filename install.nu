@@ -9,18 +9,29 @@ def home-dir [] {
   $"/home/($target_user)"
 }
 
-# Deploys a config folder to both the target user's ~/.config and /etc/skel/.config
-def dotconf [name: string] {
+# Deploys a config folder to both the target user's ~/.config and /etc/skel/.config.
+# Skel is always overwritten. The user's ~/.config is only written on first install
+# unless HYPERION_FORCE=true is set, or --always-update is passed.
+def dotconf [name: string, --always-update] {
   let folder = conf-src $name
-  let destinations = [
-    (home-dir | path join ".config")
-    "/etc/skel/.config"
-  ]
-  for dest in $destinations {
-    mkdir $dest
-    cp -r $folder $dest
+  let force = (($env | get --optional HYPERION_FORCE | default "false") in ["true", true])
+
+  # Always update skel
+  let skel_dest = "/etc/skel/.config"
+  mkdir $skel_dest
+  cp -r $folder $skel_dest
+
+  # Conditionally update user config
+  let user_dest = (home-dir | path join ".config")
+  let config_target = ($user_dest | path join $name)
+
+  if (not $always_update) and ($config_target | path exists) and (not $force) {
+    print $":: ⏭️  .config/($name) already exists — skipping \(use --force to override\)"
+  } else {
+    mkdir $user_dest
+    cp -r $folder $user_dest
+    print $":: ✔️ .config/($name)"
   }
-  print $":: ✔️ .config/($name)"
 }
 
 group "📦 System Packages" {
@@ -60,7 +71,7 @@ group "📁 Configs" {
   dotconf niri
   dotconf noctalia
   dotconf ghostty
-  dotconf hyperion
+  dotconf hyperion --always-update
 }
 
 group "🎨 SDDM Theme" {
@@ -93,7 +104,7 @@ group "🎨 SDDM Theme" {
   # Configure SDDM to use the theme with environment variables
   let sddm_conf_dir = "/etc/sddm.conf.d"
   mkdir $sddm_conf_dir
-  let sddm_config = "[General]\nInputMethod=qtvirtualkeyboard\nGreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/hyperion/components/,QT_IM_MODULE=qtvirtualkeyboard\n\n[Theme]\nCurrent=hyperion\n"
+  let sddm_config = "[General]\nInputMethod=qtvirtualkeyboard\nGreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/hyperion/components/,QT_IM_MODULE=qtvirtualkeyboard,QML_XHR_ALLOW_FILE_READ=1\n\n[Theme]\nCurrent=hyperion\n"
   $sddm_config | save -f ($sddm_conf_dir | path join "hyperion.conf")
   print ":: ✔️ SDDM configured to use hyperion theme"
 }
@@ -155,4 +166,11 @@ group "🔑 Permissions" {
   let target_user = ($env | get --optional HYPERION_USER | default $env.USER)
   run-external "chown" "-R" $"($target_user):($target_user)" (home-dir)
   print $":: ✔️ Ownership of (home-dir) restored to ($target_user)"
+
+  # Grant the sddm user just enough access to traverse the home directory
+  # so it can read ~/.config/noctalia/settings.json and the avatar image.
+  # We use a targeted ACL rather than chmod 711 to avoid opening traversal
+  # to all other users on the system.
+  run-external "setfacl" "-m" "u:sddm:x" (home-dir)
+  print $":: ✔️ sddm granted home directory traversal via ACL"
 }

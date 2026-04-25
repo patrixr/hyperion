@@ -55,14 +55,14 @@ There are two bash entry points, both of which bootstrap Nushell and then hand o
 
 ```bash
 # Paste this URL into the EOS Welcome app
-https://raw.githubusercontent.com/patrixr/hyperion/main/setup_hyperion_isomode.bash
+https://github.com/patrixr/hyperion/releases/latest/download/setup_hyperion_isomode.bash
 ```
 
 **Manual install** (after installation):
 
 ```bash
 # One-line install
-curl -sL https://raw.githubusercontent.com/patrixr/hyperion/main/hyperion.sh | sudo bash
+curl -sL https://github.com/patrixr/hyperion/releases/latest/download/hyperion.sh | sudo bash
 
 # Or clone first
 git clone --depth=1 https://github.com/patrixr/hyperion.git
@@ -107,10 +107,23 @@ The real work happens in `hyperion.nu`, which:
 
 ## Acknowledgments
 
+### Open Source Projects
+
 Hyperion incorporates and builds upon the following open source projects:
 
-- **[SilentSDDM](https://github.com/uiriansan/SilentSDDM)** by uiriansan (GPL-3.0) - SDDM theme
+- **[SilentSDDM](https://github.com/uiriansan/SilentSDDM)** by [uiriansan](https://github.com/uiriansan) (GPL-3.0) - SDDM login theme
 - **[Niri](https://github.com/YaLTeR/niri)** by YaLTeR - Scrollable-tiling Wayland compositor
 - **[Noctalia Shell](https://github.com/noctalia-dev/noctalia-shell)** by noctalia-dev - Wayland shell
 - **[Ghostty](https://ghostty.org/)** by Mitchell Hashimoto - Terminal emulator
 - **[Nushell](https://www.nushell.sh/)** - Modern shell written in Rust
+
+### Wallpaper Artists
+
+The bundled wallpapers in `images/` are used with permission or under their respective licenses:
+
+| File | Title | Artist | Source | License |
+|------|-------|--------|--------|---------|
+| `bg-1.png` | [Final Frontier](https://www.deviantart.com/prisonercoin/art/Final-Frontier-918347015) | [prisonercoin](https://www.deviantart.com/prisonercoin) | DeviantArt | Exclusive Adoptable — commercial use rights owned |
+| `bg-2.jpg` | [Parallels](https://unsplash.com/photos/person-sitting-on-brown-sand-under-starry-night-lakRKK8DDiw) | [Jacob Granneman](https://unsplash.com/@jgranneman) | Unsplash | [Unsplash License](https://unsplash.com/license) |
+| `bg-3.jpg` | [Starry Night](https://unsplash.com/photos/the-night-sky-is-filled-with-stars-and-a-lone-tree-K-ENC7LNABA) | [Thomas Chizzali](https://unsplash.com/@tchizzali) | Unsplash | [Unsplash License](https://unsplash.com/license) |
+| `bg-4.png` | [Pridwen](https://www.deviantart.com/prisonercoin/art/Pridwen-920040742) | [prisonercoin](https://www.deviantart.com/prisonercoin) | DeviantArt | Exclusive Adoptable — commercial use rights owned |

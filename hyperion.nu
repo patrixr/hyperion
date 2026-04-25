@@ -7,8 +7,9 @@
 #   nu hyperion.nu                    # Run as regular user, will request sudo
 #   sudo nu hyperion.nu               # Run as root (auto-detects user)
 #   nu hyperion.nu username           # Specify target user explicitly (ISO mode)
+#   nu hyperion.nu --force            # Overwrite existing user dot configs (niri, ghostty, noctalia)
 
-def main [username?: string] {
+def main [username?: string, --force] {
   # Determine the target username
   let target_user = if ($username != null) {
     $username
@@ -31,13 +32,13 @@ def main [username?: string] {
   if $is_root {
     # Already root, run install directly
     print ":: Running as root"
-    with-env { HYPERION_USER: $target_user } {
+    with-env { HYPERION_USER: $target_user, HYPERION_FORCE: ($force | into string) } {
       nu ($script_dir | path join "install.nu")
     }
   } else {
     # Not root, need to elevate
     print ":: Requesting sudo access..."
-    sudo nu -c $"cd ($script_dir); HYPERION_USER=($target_user) nu install.nu"
+    sudo nu -c $"cd ($script_dir); HYPERION_USER=($target_user) HYPERION_FORCE=($force) nu install.nu"
   }
 
   print ":: Hyperion CE complete. Log out and back in for all changes to take effect."

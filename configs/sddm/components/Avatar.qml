@@ -19,38 +19,46 @@ Rectangle {
         return request.responseText;
     }
     
-    // Compute the actual avatar source
+    // Compute the actual avatar source.
+    // Resolution order:
+    //   1. avatarImage from ~/.config/noctalia/settings.json → general.avatarImage  (explicit user preference)
+    //   2. SDDM-provided icon (if it isn't the generic user-default placeholder)
+    //   3. ~/.face as a last resort
     property string actualSource: {
-        // First try SDDM's provided source
-        if (source && source !== "" && source.indexOf("user-default") === -1) {
-            return source;
-        }
-        
-        // Try to load from noctalia settings
         var user = username !== "" ? username : (sddm.currentUser || "");
-        if (user === "") {
-            console.log("Avatar: No username available, using default");
+
+        // 1. Read avatar path from noctalia settings (general.avatarImage) — highest priority
+        if (user !== "") {
+            var settingsPath = "file:///home/" + user + "/.config/noctalia/settings.json";
+            try {
+                var jsonText = readTextFile(settingsPath);
+                if (jsonText && jsonText !== "") {
+                    var settings = JSON.parse(jsonText);
+                    var avatarPath = settings && settings.general && settings.general.avatarImage;
+                    if (avatarPath && avatarPath !== "") {
+                        var url = avatarPath.startsWith("file://") ? avatarPath : "file://" + avatarPath;
+                        console.log("Avatar: using noctalia avatar for " + user + ": " + url);
+                        return url;
+                    }
+                }
+            } catch (e) {
+                console.log("Avatar: could not read noctalia settings for " + user + ": " + e);
+            }
+        }
+
+        // 2. Use whatever SDDM resolved, unless it is the generic placeholder
+        if (source && source !== "" && source.indexOf("user-default") === -1) {
+            console.log("Avatar: falling back to SDDM-provided icon: " + source);
             return source;
         }
-        
-        var settingsPath = "file:///home/" + user + "/.config/noctalia/settings.json";
-        
-        try {
-            var jsonText = readTextFile(settingsPath);
-            var settings = JSON.parse(jsonText);
-            if (settings && settings.avatarImage) {
-                console.log("Avatar: Loading from noctalia for user " + user + ": " + settings.avatarImage);
-                return "file://" + settings.avatarImage;
-            }
-        } catch (e) {
-            // Settings file not found or invalid JSON
-            console.log("Avatar: Could not load noctalia settings for user " + user + ": " + e);
+
+        // 3. Last resort: ~/.face
+        if (user !== "") {
+            console.log("Avatar: falling back to ~/.face for " + user);
+            return "file:///home/" + user + "/.face";
         }
-        
-        // Fallback to checking if ~/.face exists
-        var facePath = "file:///home/" + user + "/.face";
-        console.log("Avatar: Falling back to ~/.face for user " + user);
-        return facePath;
+
+        return source;
     }
     property int squareRadius: (shape == "circle") ? this.width : (Config.avatarBorderRadius === 0 ? 1 : Config.avatarBorderRadius * Config.generalScale) // min: 1
     property bool drawStroke: (active && Config.avatarActiveBorderSize > 0) || (!active && Config.avatarInactiveBorderSize > 0)

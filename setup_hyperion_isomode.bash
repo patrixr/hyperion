@@ -21,7 +21,7 @@ pacman -S --needed --noconfirm nushell
 
 # Run the main nushell entry point, passing the target username
 echo ":: Handing off to hyperion.nu..."
-nu hyperion/hyperion.nu "$username"
+nu hyperion/hyperion.nu "$username" --force
 
 # Clean up the cloned repo
 echo ":: Cleaning up..."
