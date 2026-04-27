@@ -52,6 +52,10 @@ group "📦 System Packages" {
     print ":: ✔️ SDDM enabled"
   }
 
+  run-external "systemctl" "enable" "bluetooth"
+  print ":: ✔️ Bluetooth service enabled"
+
+
   # For SDDM theme
   install qt6-svg
   install qt6-virtualkeyboard
@@ -72,6 +76,22 @@ group "📦 System Packages" {
 
   add-chaotic-aur
   install noctalia-shell
+
+  # XWayland support for legacy X11 apps
+  install xwayland-satellite
+
+  # Clipboard utility
+  install xclip
+}
+
+group "🎨 GTK Theming" {
+  # GTK3 theme that matches libadwaita (GTK4) look
+  install adw-gtk-theme --aur
+
+  # GTK appearance settings editor for Wayland compositors
+  install nwg-look --aur {
+    gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3'
+  }
 }
 
 group "📁 Configs" {
